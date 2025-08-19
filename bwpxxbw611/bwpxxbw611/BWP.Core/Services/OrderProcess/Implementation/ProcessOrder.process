@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:pfx="http://www.tibco.com/bwp/schemas/purchaseorder" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/pe/CheckpointSchema" xmlns:pfx3="http://www.tibco.com/bwp/services/creditcheckconcrete" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns5="http://www.tibco.com/bwp/schemas/creditcheck" xmlns:ns6="http://www.tibco.com/bwp/schemas/lineitem" xmlns:ns7="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/SalesOrderSubscription01" xmlns:DeliveryMapping="java://com.tibco.BWBootcamp.DeliveryMapping" xmlns:pfx4="http://www.tibco.com/bwp/schemas/order" xmlns:pfx5="http://www.tibco.com/bwp/schemas/opresult" xmlns:ns8="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/SalesOrderSubscriptionXX">
+    <xsd:import namespace="http://www.tibco.com/bwp/schemas/purchaseorder" schemaLocation="/BWP.Core/Schema/PurchaseOrderSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/bwp/schemas/opresult" schemaLocation="/BWP.Core/Schema/OrderProcessingResult.xsd"/>
+    <wsdl:import namespace="http://www.tibco.com/bwp/services/creditcheckconcrete" location="/BWP.Core/Services/CreditCheck/Contract/CreditCheckService_ConcreteWSDL_UDDI.wsdl"/>
+    <pd:name>BWP.Core/Services/OrderProcess/Implementation/ProcessOrder.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PurchaseOrder"/>
+    <pd:startX>38</pd:startX>
+    <pd:startY>57</pd:startY>
+    <pd:returnBindings>
+        <pfx5:OrderProcessingResult>
+            <pfx5:FileName>
+                <xsl:value-of select="$OrderResult/FileName"/>
+            </pfx5:FileName>
+        </pfx5:OrderProcessingResult>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx5:OrderProcessingResult"/>
+    <pd:endX>731</pd:endX>
+    <pd:endY>218</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247692841823</pd:targetNamespace>
+    <pd:activity name="Compute OrderID and Price">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>130</pd:x>
+        <pd:y>47</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="OrderID" type="xsd:string"/>
+                            <xsd:element name="TotalPrice" type="xsd:decimal"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <OrderID>
+                    <xsl:value-of select="concat(&quot;TIB-&quot;, string($_processContext/ns4:ProcessContext/ProcessId), &quot;-&quot;, &#xA;tib:format-dateTime(&quot;yyyyMMddHHmmss&quot;, current-dateTime()))"/>
+                </OrderID>
+                <TotalPrice>
+                    <xsl:value-of select="sum(for $orderline in $Start/pfx:PurchaseOrder/pfx:LineItem return $orderline/pfx:Quantity &#xA;* $orderline/pfx:UnitPrice)"/>
+                </TotalPrice>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Price">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>229</pd:x>
+        <pd:y>44</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&quot;Order ID: &quot;, $Compute-OrderID-and-Price/root/OrderID, &quot;; &quot;, &#xA;&quot;Total Price: &quot;, $Compute-OrderID-and-Price/root/TotalPrice)"/>
+                </message>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Checkpoint">
+        <pd:type>com.tibco.pe.core.CheckpointActivity</pd:type>
+        <pd:resourceType>ae.process.checkpoint</pd:resourceType>
+        <pd:x>324</pd:x>
+        <pd:y>44</pd:y>
+        <config/>
+        <pd:inputBindings>
+            <pfx2:input/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Invoke Credit Check Service">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>102</pd:x>
+        <pd:y>171</pd:y>
+        <config>
+            <timeout>0</timeout>
+            <service>pfx3:intfPerformCreditCheck-service.serviceagent</service>
+            <servicePort>intfwsPerformCreditCheckEndpoint1</servicePort>
+            <operation>PerformCreditCheckOp</operation>
+            <soapAction>/BWP.Core/Services/CreditCheck/Interface/intfPerformCreditCheck-service.serviceagent/intfwsPerformCreditCheckEndpoint1/PerformCreditCheckOp</soapAction>
+            <endpointURL>http://educlt:7575/BWP.Core/Services/CreditCheck/Interface/intfPerformCreditCheck-service.serviceagent</endpointURL>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <ns5:CreditCheckRequest>
+                    <ns5:Amount>
+                        <xsl:value-of select="$Compute-OrderID-and-Price/root/TotalPrice"/>
+                    </ns5:Amount>
+                    <ns5:AccountID>
+                        <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:CustomerID"/>
+                    </ns5:AccountID>
+                </ns5:CreditCheckRequest>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Credit Check Failed">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>208</pd:x>
+        <pd:y>305</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Credit Request Rejected">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>342</pd:x>
+        <pd:y>229</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ProcessInventory">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>428</pd:x>
+        <pd:y>143</pd:y>
+        <config>
+            <processName>/BWP.Core/Services/OrderProcess/Implementation/ProcessInventory.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx:PurchaseOrder"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Compute Order Status">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>539</pd:x>
+        <pd:y>68</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="OrderStatus" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <OrderStatus>
+                    <xsl:value-of select="if (exists($ProcessInventory/ns6:LineItems/ns6:Item [ns6:ItemStatus='Back Order'])) then &quot;NOT READY&quot; else &quot;READY&quot;"/>
+                </OrderStatus>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Compute Line Item Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>660</pd:x>
+        <pd:y>65</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="LineItemData" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ItemID" type="xsd:string"/>
+                                        <xsd:element name="ItemDesc" type="xsd:string"/>
+                                        <xsd:element name="Quantity" type="xsd:int"/>
+                                        <xsd:element name="Status" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Start/pfx:PurchaseOrder/pfx:LineItem">
+                    <xsl:variable name="position" select="position()"/>
+                    <xsl:variable name="item" select="$ProcessInventory/ns6:LineItems/ns6:Item[$position]"/>
+                    <LineItemData>
+                        <ItemID>
+                            <xsl:value-of select="$item/ns6:ItemID"/>
+                        </ItemID>
+                        <ItemDesc>
+                            <xsl:value-of select="$item/ns6:ItemDesc"/>
+                        </ItemDesc>
+                        <Quantity>
+                            <xsl:value-of select="pfx:Quantity"/>
+                        </Quantity>
+                        <Status>
+                            <xsl:value-of select="$item/ns6:ItemStatus"/>
+                        </Status>
+                    </LineItemData>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Store Order">
+        <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+        <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+        <pd:x>778</pd:x>
+        <pd:y>45</pd:y>
+        <config>
+            <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+            <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+            <ae.aepalette.sharedProperties.adapterService>/AdapterServices/SalesOrderSubscriptionXX.adb#adapterService.SalesOrderSub</ae.aepalette.sharedProperties.adapterService>
+            <tpPluginEndpointName>SalesOrderSub</tpPluginEndpointName>
+            <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+            <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Domain%%.%%Deployment%%.adb.SalesOrderSubscriptionXX.SalesOrderSub</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+            <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+            <ae.aepalette.sharedProperties.timeToLive>0</ae.aepalette.sharedProperties.timeToLive>
+            <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+            <ae.aepalette.sharedProperties.jmsSessionUsername/>
+            <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+            <ae.aepalette.sharedProperties.outputMeta>
+                <aeMeta>/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#class.SALES_ORDER</aeMeta>
+            </ae.aepalette.sharedProperties.outputMeta>
+        </config>
+        <pd:inputBindings>
+            <aePubInputType>
+                <body>
+                    <ns8:SALES__ORDER>
+                        <ORDER__ID>
+                            <xsl:value-of select="$Compute-OrderID-and-Price/root/OrderID"/>
+                        </ORDER__ID>
+                        <CUSTOMER__ID>
+                            <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:CustomerID"/>
+                        </CUSTOMER__ID>
+                        <ORDER__DATE>
+                            <dateTime>
+                                <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:OrderDate"/>
+                            </dateTime>
+                        </ORDER__DATE>
+                        <SHIPMENT__DATE>
+                            <dateTime>
+                                <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:ShipmentDate"/>
+                            </dateTime>
+                        </SHIPMENT__DATE>
+                        <SHIPMENT__LOCATION>
+                            <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:ShipmentLocation"/>
+                        </SHIPMENT__LOCATION>
+                        <TOTAL__AMOUNT>
+                            <xsl:value-of select="$Compute-OrderID-and-Price/root/TotalPrice"/>
+                        </TOTAL__AMOUNT>
+                        <DELIVERY__METHOD>
+                            <xsl:value-of select="DeliveryMapping:getDeliveryString($Start/pfx:PurchaseOrder/pfx:DeliveryMethod)"/>
+                        </DELIVERY__METHOD>
+                        <xsl:choose>
+                            <xsl:when test="$Start/pfx:PurchaseOrder/pfx:Priority = &quot;High&quot;">
+                                <PRIORITY>
+                                    <xsl:value-of select="&quot;Y&quot;"/>
+                                </PRIORITY>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <PRIORITY>
+                                    <xsl:value-of select="&quot;N&quot;"/>
+                                </PRIORITY>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <STATUS>
+                            <xsl:value-of select="$Compute-Order-Status/root/OrderStatus"/>
+                        </STATUS>
+                        <ADB__SEQUENCE__ORDER__DETAIL>
+                            <xsl:for-each select="$Compute-Line-Item-Data/root/LineItemData">
+                                <item>
+                                    <ORDER__ID>
+                                        <xsl:value-of select="$Compute-OrderID-and-Price/root/OrderID"/>
+                                    </ORDER__ID>
+                                    <ITEM__ID>
+                                        <xsl:value-of select="ItemID"/>
+                                    </ITEM__ID>
+                                    <QUANTITY>
+                                        <xsl:value-of select="number(Quantity)"/>
+                                    </QUANTITY>
+                                    <STATUS>
+                                        <xsl:value-of select="Status"/>
+                                    </STATUS>
+                                </item>
+                            </xsl:for-each>
+                        </ADB__SEQUENCE__ORDER__DETAIL>
+                    </ns8:SALES__ORDER>
+                </body>
+            </aePubInputType>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="OrderResult">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>635</pd:x>
+        <pd:y>259</pd:y>
+        <config>
+            <processName>/BWP.Core/Services/OrderProcess/Implementation/OrderResult.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:Order>
+                <pfx4:OrderID>
+                    <xsl:value-of select="$Compute-OrderID-and-Price/root/OrderID"/>
+                </pfx4:OrderID>
+                <pfx4:CustomerID>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:CustomerID"/>
+                </pfx4:CustomerID>
+                <pfx4:TotalPrice>
+                    <xsl:value-of select="$Compute-OrderID-and-Price/root/TotalPrice"/>
+                </pfx4:TotalPrice>
+                <pfx4:OrderStatus>
+                    <xsl:value-of select="if ($Compute-Order-Status/root/OrderStatus) then $Compute-Order-Status/root/OrderStatus else &quot;Rejected&quot;"/>
+                </pfx4:OrderStatus>
+                <xsl:choose>
+                    <xsl:when test="$_error">
+                        <pfx4:CreditStatus>
+                            <xsl:value-of select="&quot;Failed&quot;"/>
+                        </pfx4:CreditStatus>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <pfx4:CreditStatus>
+                            <xsl:value-of select="$Invoke-Credit-Check-Service/outputMessage/ns5:CreditCheckResult/ns5:Status"/>
+                        </pfx4:CreditStatus>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <pfx4:OrderDate>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:OrderDate"/>
+                </pfx4:OrderDate>
+                <pfx4:ShipmentDate>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:ShipmentDate"/>
+                </pfx4:ShipmentDate>
+                <pfx4:ShipmentLocation>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:ShipmentLocation"/>
+                </pfx4:ShipmentLocation>
+                <pfx4:DeliveryMethod>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:DeliveryMethod"/>
+                </pfx4:DeliveryMethod>
+                <pfx4:Priority>
+                    <xsl:value-of select="$Start/pfx:PurchaseOrder/pfx:Priority"/>
+                </pfx4:Priority>
+                <xsl:choose>
+                    <xsl:when test="exists($Compute-Line-Item-Data/root/LineItemData)">
+                        <xsl:for-each select="$Compute-Line-Item-Data/root/LineItemData">
+                            <pfx4:OrderItems>
+                                <pfx4:ItemID>
+                                    <xsl:value-of select="ItemID"/>
+                                </pfx4:ItemID>
+                                <pfx4:ItemDesc>
+                                    <xsl:value-of select="ItemDesc"/>
+                                </pfx4:ItemDesc>
+                                <pfx4:Quantity>
+                                    <xsl:value-of select="Quantity"/>
+                                </pfx4:Quantity>
+                                <pfx4:Status>
+                                    <xsl:value-of select="Status"/>
+                                </pfx4:Status>
+                            </pfx4:OrderItems>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:for-each select="$Start/pfx:PurchaseOrder/pfx:LineItem">
+                            <pfx4:OrderItems>
+                                <pfx4:ItemID>
+                                    <xsl:value-of select="pfx:Item"/>
+                                </pfx4:ItemID>
+                                <pfx4:ItemDesc>
+                                    <xsl:value-of select="&quot;N/A&quot;"/>
+                                </pfx4:ItemDesc>
+                                <pfx4:Quantity>
+                                    <xsl:value-of select="pfx:Quantity"/>
+                                </pfx4:Quantity>
+                                <pfx4:UnitPrice>
+                                    <xsl:value-of select="pfx:UnitPrice"/>
+                                </pfx4:UnitPrice>
+                                <pfx4:Status>
+                                    <xsl:value-of select="&quot;N/A&quot;"/>
+                                </pfx4:Status>
+                            </pfx4:OrderItems>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </pfx4:Order>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Compute OrderID and Price</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Compute OrderID and Price</pd:from>
+        <pd:to>Log Price</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Price</pd:from>
+        <pd:to>Checkpoint</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Checkpoint</pd:from>
+        <pd:to>Invoke Credit Check Service</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke Credit Check Service</pd:from>
+        <pd:to>Credit Check Failed</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke Credit Check Service</pd:from>
+        <pd:to>Credit Request Rejected</pd:to>
+        <pd:xpathDescription>Rejected</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke Credit Check Service</pd:from>
+        <pd:to>ProcessInventory</pd:to>
+        <pd:xpathDescription>Accepted</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Invoke-Credit-Check-Service/outputMessage/ns5:CreditCheckResult/ns5:Status = "Accepted"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ProcessInventory</pd:from>
+        <pd:to>Compute Order Status</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Compute Order Status</pd:from>
+        <pd:to>Compute Line Item Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Compute Line Item Data</pd:from>
+        <pd:to>Store Order</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Store Order</pd:from>
+        <pd:to>OrderResult</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Credit Request Rejected</pd:from>
+        <pd:to>OrderResult</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Credit Check Failed</pd:from>
+        <pd:to>OrderResult</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>OrderResult</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

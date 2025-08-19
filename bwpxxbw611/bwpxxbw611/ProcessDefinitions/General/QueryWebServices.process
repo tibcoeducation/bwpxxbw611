@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <pd:name>ProcessDefinitions/General/QueryWebServices.process</pd:name>
+    <pd:startName>Wait for WSDL Requests</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Wait for WSDL Requests">
+        <pd:type>com.tibco.plugin.http.HTTPEventSource</pd:type>
+        <pd:resourceType>httppalette.httpEventSource</pd:resourceType>
+        <pd:x>89</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <outputMode>String</outputMode>
+            <defaultEncoding>ISO8859_1</defaultEncoding>
+            <inputOutputVersion>5.3.0</inputOutputVersion>
+            <newMimeSupport>true</newMimeSupport>
+            <sharedChannel>/BWP.Core/Connections/SOAPServerHTTP.sharedhttp</sharedChannel>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Accept" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Charset" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Encoding" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Length" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Connection" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>614</pd:endX>
+    <pd:endY>63</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247605646800</pd:targetNamespace>
+    <pd:activity name="RetrieveResources">
+        <pd:type>com.tibco.plugin.soap.urlaccess.RetrieveResource</pd:type>
+        <pd:resourceType>ae.activities.RetrieveResource</pd:resourceType>
+        <pd:x>264</pd:x>
+        <pd:y>71</pd:y>
+        <config/>
+        <pd:inputBindings>
+            <inputClass>
+                <resourcePath>
+                    <xsl:value-of select="$Wait-for-WSDL-Requests/ProcessStarterOutput/RequestURI"/>
+                </resourcePath>
+                <xsl:if test="$Wait-for-WSDL-Requests/ProcessStarterOutput/QueryString">
+                    <filter>
+                        <xsl:value-of select="$Wait-for-WSDL-Requests/ProcessStarterOutput/QueryString"/>
+                    </filter>
+                </xsl:if>
+                <hostname>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/bwp/host.Name"/>
+                </hostname>
+            </inputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Error">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>411</pd:x>
+        <pd:y>162</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&quot;A WSDL was requested for a Web Service that does not exist: &quot;, $Wait-for-WSDL-Requests/ProcessStarterOutput/RequestURI)"/>
+                </message>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send WSDL Interfaces">
+        <pd:type>com.tibco.plugin.http.HTTPResponseActivity</pd:type>
+        <pd:resourceType>httppalette.httpWebResponse</pd:resourceType>
+        <pd:x>509</pd:x>
+        <pd:y>77</pd:y>
+        <config>
+            <closeConnection>true</closeConnection>
+            <eventSource>Wait for WSDL Requests</eventSource>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="StatusLine" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Set-Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Location" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings>
+            <ResponseActivityInput>
+                <xsl:choose>
+                    <xsl:when test="$_error">
+                        <asciiContent>
+                            <xsl:value-of select="concat(&quot;&lt;HTML>&lt;HEAD>&lt;TITLE>TIBCO BusinessWorks - Error 404: WSDL file not Found.&lt;/TITLE>&lt;style>&lt;!-- .Header { font-family: Verdana; font-size: 14pt; background-color: #9999CC; color: #FFFFFF } .normal { font-family: Verdana } .notes { font-family: Arial; font-size: 10pt; font-style: italic } -->&lt;/style>&lt;/HEAD>&lt;BODY>&lt;br>&lt;br>&lt;table width=50% align=center border=0 bgcolor=#DCDCDC cellpadding=3 cellspacing=0>&lt;tr bgcolor=#9999cc>&lt;td class=header>TIBCO BusinessWorks&lt;/td>&lt;/tr>&lt;tr>&lt;td align=center valign=middle class=normal>&lt;br>&lt;font size=4> 404 Error:&lt;/font> The requested WSDL file was not found.&lt;p>&quot;, &#xA;$Wait-for-WSDL-Requests/ProcessStarterOutput/RequestURI,&#xA;&quot;&lt;/p>&lt;p>Please check the URL and try again.&lt;/p>&lt;table border=0 width=40% cellspacing=0 cellpadding=0>&lt;tr>&lt;td class=notes>&lt;b>Check the following:&lt;/b>&lt;/td>&lt;/tr>&lt;tr>&lt;td class=notes>&lt;ul>&lt;li>spelling of the URL?&lt;/li>&lt;li>upper or lower case?&lt;/li>&lt;li>correct port number?&lt;/li>&lt;li>correct host name?&lt;/li>&lt;/ul> &lt;/td>&lt;/tr>&lt;/table>&lt;div align=center>&lt;center>&lt;table border=0 cellspacing=0 cellpadding=0>&lt;tr>&lt;td class=notes>If problems persist contact the Administrator.&lt;/td>&lt;/tr>&lt;tr>&lt;td class=notes>&lt;ul>&lt;li>Process:&amp;nbsp;&lt;b>&quot;,&#xA;$_processContext/ns1:ProcessContext/ProcessId,&#xA;&quot;&lt;/b>&lt;/li>&lt;li>Project:&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b>&quot;,&#xA;$_processContext/ns1:ProcessContext/ProjectName,&#xA;&quot;&lt;/b>&lt;/li>&lt;li>Engine:&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b>&quot;,&#xA;$_processContext/ns1:ProcessContext/EngineName ,&#xA;&quot;&lt;/b>&lt;/li>&lt;li>Date:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b>&quot;,&#xA;tib:format-dateTime(&quot;dd MMM yyyy&quot;, current-dateTime()),&#xA;&quot;&lt;/b>&lt;/li>&lt;li>Time:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b>&quot;,&#xA;&quot;&lt;/b>&lt;/li>&lt;/ul>&lt;/td>&lt;/tr>&lt;/table>&lt;/center>&lt;/div>&amp;nbsp;&lt;/td>&lt;/tr>&lt;/table>&lt;/BODY>&lt;/HTML>;&quot;,&#xA;&quot;&lt;/HTML>&quot;)"/>
+                        </asciiContent>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="$RetrieveResources/outputClass/resourceData">
+                            <asciiContent>
+                                <xsl:value-of select="$RetrieveResources/outputClass/resourceData"/>
+                            </asciiContent>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ResponseActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Wait for WSDL Requests</pd:from>
+        <pd:to>RetrieveResources</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RetrieveResources</pd:from>
+        <pd:to>Log Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RetrieveResources</pd:from>
+        <pd:to>Send WSDL Interfaces</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send WSDL Interfaces</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Error</pd:from>
+        <pd:to>Send WSDL Interfaces</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

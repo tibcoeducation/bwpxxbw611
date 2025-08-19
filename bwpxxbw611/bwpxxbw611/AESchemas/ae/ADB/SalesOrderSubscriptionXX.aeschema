@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Repository:repository xmlns:Repository="http://www.tibco.com/xmlns/repo/types/2002" xmlns="http://www.tibco.com/xmlns/aemeta/types/2002" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <designer>
+        <lockedProperties>
+            <locked>
+                <resource>/Associations/SALES_ORDER^ORDER_DETAIL/Right Assocation</resource>
+                <properties>name</properties>
+            </locked>
+            <locked>
+                <resource>/Associations/SALES_ORDER^ORDER_DETAIL/Left Association</resource>
+                <properties>name</properties>
+            </locked>
+        </lockedProperties>
+        <fixedChildren/>
+        <resourceDescriptions/>
+    </designer>
+    <class name="SALES_ORDER">
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ORDER_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>true</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>CUSTOMER_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ORDER_DATE</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/adbmetadata.aeschema#class.adbDateTime</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>SHIPMENT_DATE</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/adbmetadata.aeschema#class.adbDateTime</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>SHIPMENT_LOCATION</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>TOTAL_AMOUNT</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.r8</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>DELIVERY_METHOD</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>PRIORITY</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>STATUS</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_SEQUENCE_ORDER_DETAIL</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#sequence.sequence[ORDER_DETAIL]</attributeType>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_OPCODE</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.i4</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_TRACKINGID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+    </class>
+    <class name="ORDER_DETAIL">
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ORDER_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ITEM_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>QUANTITY</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.r8</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>STATUS</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_OPCODE</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.i4</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_TRACKINGID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+    </class>
+    <sequence name="sequence[ORDER_DETAIL]">
+        <elementType isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#class.ORDER_DETAIL</elementType>
+    </sequence>
+    <class name="SALES_ORDER_GROUP">
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_ROW</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#sequence.sequence[SALES_ORDER]</attributeType>
+        </attribute>
+    </class>
+    <sequence name="sequence[SALES_ORDER]">
+        <elementType isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#class.SALES_ORDER</elementType>
+    </sequence>
+    <association name="SALES_ORDER^ORDER_DETAIL">
+        <endpoint>
+            <roleName>roleSALES_ORDER</roleName>
+            <maxMultiplicity>1</maxMultiplicity>
+            <minMultiplicity>1</minMultiplicity>
+            <isNavigable>true</isNavigable>
+            <endpointType/>
+            <endpointClass isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#class.SALES_ORDER</endpointClass>
+            <keyField>ORDER_ID</keyField>
+        </endpoint>
+        <endpoint>
+            <roleName>roleORDER_DETAIL</roleName>
+            <maxMultiplicity>-1</maxMultiplicity>
+            <minMultiplicity>1</minMultiplicity>
+            <isNavigable>true</isNavigable>
+            <endpointType/>
+            <endpointClass isRef="true">/AESchemas/ae/ADB/SalesOrderSubscriptionXX.aeschema#class.ORDER_DETAIL</endpointClass>
+            <keyField>ORDER_ID</keyField>
+        </endpoint>
+        <name>SALES_ORDER^ORDER_DETAIL</name>
+    </association>
+    <class name="SALES_EXCEP">
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ORDER_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>true</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>CUSTOMER_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ORDER_DATE</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/adbmetadata.aeschema#class.adbDateTime</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>SHIPMENT_DATE</name>
+            <attributeType isRef="true">/AESchemas/ae/ADB/adbmetadata.aeschema#class.adbDateTime</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>SHIPMENT_LOCATION</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>TOTAL_AMOUNT</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.r8</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>DELIVERY_METHOD</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>PRIORITY</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>STATUS</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_TRACKINGID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_OPCODE</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.i4</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_UPDATE_ALL</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.i4</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_ERROR_TEXT</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+        <attribute>
+            <isReadable>true</isReadable>
+            <isWriteable>true</isWriteable>
+            <name>ADB_JOIN_ID</name>
+            <attributeType isRef="true">/AESchemas/ae.aeschema#scalar.string</attributeType>
+            <isKey>false</isKey>
+        </attribute>
+    </class>
+</Repository:repository>

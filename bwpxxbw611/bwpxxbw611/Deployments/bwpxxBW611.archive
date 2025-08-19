@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Repository:repository xmlns:Repository="http://www.tibco.com/xmlns/repo/types/2002">
+    <enterpriseArchive>
+        <sharedArchive name="Shared Archive">
+            <resourceType>shared.archive.resource</resourceType>
+            <authorProperty>Administrator</authorProperty>
+        </sharedArchive>
+        <adapterArchive name="SalesOrderSubscriptionXX">
+            <resourceType>adapter.archive.resource</resourceType>
+            <authorProperty>Administrator</authorProperty>
+            <sdkVersion>5.5.0</sdkVersion>
+            <wantsManualSdkVersionUpdates>true</wantsManualSdkVersionUpdates>
+            <adapterReference>/AdapterServices/SalesOrderSubscriptionXX.adb#adapter.SalesOrderSubscriptionXX</adapterReference>
+            <softwareTypeProperty>adb</softwareTypeProperty>
+        </adapterArchive>
+        <processArchive name="ProcessOrderService">
+            <resourceType>process.archive.resource</resourceType>
+            <authorProperty>Administrator</authorProperty>
+            <processProperty>/BWP.Core/Services/OrderProcess/Interface/intfProcessOrder-service.serviceagent</processProperty>
+        </processArchive>
+        <processArchive name="CreditCheckService">
+            <resourceType>process.archive.resource</resourceType>
+            <authorProperty>Administrator</authorProperty>
+            <processProperty>/BWP.Core/Services/CreditCheck/Interface/intfPerformCreditCheck-service.serviceagent</processProperty>
+        </processArchive>
+        <processArchive name="ReceiveOrders">
+            <resourceType>process.archive.resource</resourceType>
+            <authorProperty>Administrator</authorProperty>
+            <processProperty>/ProcessDefinitions/OrderProcess/ProcessBatchOrder.process,/ProcessDefinitions/OrderProcess/ProcessWebOrder.process,/ProcessDefinitions/OrderProcess/ProcessWebOrderSecure.process</processProperty>
+        </processArchive>
+        <versionProperty>4</versionProperty>
+        <authorProperty>Administrator</authorProperty>
+        <addServiceSettableGvars>true</addServiceSettableGvars>
+        <name>bwpxxBW611</name>
+        <designer>
+            <lockedProperties>
+                <locked>
+                    <resource>/SalesOrderSubscriptionXX</resource>
+                    <properties>sdkVersion</properties>
+                </locked>
+            </lockedProperties>
+            <fixedChildren/>
+            <resourceDescriptions/>
+        </designer>
+        <fileLocationProperty>C:\bwpxxbw611.ear</fileLocationProperty>
+    </enterpriseArchive>
+</Repository:repository>

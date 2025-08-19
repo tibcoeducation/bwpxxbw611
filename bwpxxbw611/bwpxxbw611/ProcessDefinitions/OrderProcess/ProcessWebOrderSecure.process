@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/bwp/services/processorderconcrete" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://www.tibco.com/bwp/schemas/purchaseorder" xmlns:ns1="http://www.tibco.com/bwp/schemas/opresult" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:ns22="http://xmlns.tibco.com/body" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/mail">
+    <wsdl:import namespace="http://www.tibco.com/bwp/services/processorderconcrete" location="/BWP.Core/Services/CreditCheck/Contract/ProcessOrderService_ConcreteWSDL.wsdl"/>
+    <pd:name>ProcessDefinitions/OrderProcess/ProcessWebOrderSecure.process</pd:name>
+    <pd:startName>Receive Web Order</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Receive Web Order">
+        <pd:type>com.tibco.plugin.http.HTTPEventSource</pd:type>
+        <pd:resourceType>httppalette.httpEventSource</pd:resourceType>
+        <pd:x>71</pd:x>
+        <pd:y>60</pd:y>
+        <config>
+            <outputMode>String</outputMode>
+            <defaultEncoding>ISO8859_1</defaultEncoding>
+            <inputOutputVersion>5.3.0</inputOutputVersion>
+            <newMimeSupport>true</newMimeSupport>
+            <sharedChannel>/BWP.Core/Connections/SecureWebOrderHTTPS.sharedhttp</sharedChannel>
+            <parsePostData>true</parsePostData>
+            <customField>
+                <row>
+                    <attribute>account</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+                <row>
+                    <attribute>shiplocation</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+                <row>
+                    <attribute>email</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+                <row>
+                    <attribute>orderdate</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+                <row>
+                    <attribute>priority</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+                <row>
+                    <attribute>delivery</attribute>
+                    <attributeType>string</attributeType>
+                    <attributeCard>optional</attributeCard>
+                </row>
+            </customField>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Accept" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Charset" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Encoding" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Length" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Connection" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>876</pd:endX>
+    <pd:endY>188</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247786471140</pd:targetNamespace>
+    <pd:activity name="Log Order">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>200</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&quot;Received Web Order from account: &quot;, $Receive-Web-Order/ProcessStarterOutput/parameters/account)"/>
+                </message>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse POST Parameters">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>313</pd:x>
+        <pd:y>80</pd:y>
+        <config>
+            <fileName>ProcessWebOrderSecureParsePOSTParameters</fileName>
+            <packageName>ProcessDefinitions.OrderProcess.ProcessWebOrderSecure</packageName>
+            <fullsource>package ProcessDefinitions.OrderProcess.ProcessWebOrderSecure;
+import java.util.*;
+import java.io.*;
+@SuppressWarnings("unchecked")
+public class ProcessWebOrderSecureParsePOSTParameters{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String postData = "";
+	protected String[] items = null;
+	public String getpostData() {
+		return postData;
+	}
+	public void setpostData(String val) {
+		postData = val;
+	}
+	public String[] getitems() {
+		return items;
+	}
+	public void setitems(String[] val) {
+		items = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public ProcessWebOrderSecureParsePOSTParameters() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String postData
+	Out : String[] items
+* Available Variables: DO NOT MODIFY *****/
+
+
+/* TIBCO Education Programs
+ * (c) Copyright 2004-2008, TIBCO Software Inc.  All rights reserved.
+ * LEGAL NOTICE:  This source code is provided to specific authorized end
+ * users pursuant to a separate license agreement.  You MAY NOT use this
+ * source code if you do not have a separate license from TIBCO Software
+ * Inc.  Except as expressly set forth in such license agreement, this
+ * source code, or any portion thereof, may not be used, modified,
+ * reproduced, transmitted, or distributed in any form or by any means,
+ * electronic or mechanical, without written permission from  TIBCO
+ * Software Inc.
+ */
+
+		StringTokenizer token = new StringTokenizer(getpostData(), "&amp;");
+
+        final String[] NAMES= {"item", "pric", "desc", "quan"};
+        final int NAMELENGTH= NAMES[0].length();
+        final int NAMESCOUNT= NAMES.length;
+        final Vector[] v = new Vector[NAMESCOUNT];
+
+        String itemNames= "";
+        for  (int i= 0;  i &lt; NAMESCOUNT;  ++i) {
+           v[i]= new Vector();
+           itemNames += NAMES[i];
+        }
+
+        while (token.hasMoreTokens())
+        {
+            String t = token.nextToken();
+            String part = t.substring(0, NAMELENGTH);
+            int vIndex= itemNames.indexOf(part);
+            if  (vIndex &gt;= 0)  v[vIndex/NAMELENGTH].addElement(t);
+        }
+
+        for  (int i= 0;  i &lt; NAMESCOUNT;  ++i)
+        {
+           Collections.sort(v[i]);
+        }
+
+        Vector result= new Vector();
+        while  (!v[0].isEmpty())
+        {
+            String lastNameVal= (String)v[NAMESCOUNT-1].firstElement();
+            String lastValue= lastNameVal.substring(lastNameVal.indexOf("=")+1, lastNameVal.length());
+
+            if  (lastValue.length() &gt; 0)
+            {
+               String valueList= "";
+               for  (int i= 0;  i &lt; NAMESCOUNT-1;  ++i)
+               {
+                   String t= (String)v[i].firstElement();
+                   valueList+= t.substring(t.indexOf("=")+1, t.length()) + ",";
+               }
+               result.addElement(valueList + lastValue);
+            }
+
+            for  (int i= 0;  i &lt; NAMESCOUNT;  ++i) v[i].remove(0);
+          }
+
+      String[] ret = new String[result.size()];
+		for (int i = 0; i &lt; ret.length; i++)
+         {
+            ret[i] = (String)result.elementAt(i);
+         }
+      setitems(ret);
+
+}
+}
+</fullsource>
+            <inputData>
+                <row>
+                    <fieldName>postData</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+            </inputData>
+            <outputData>
+                <row>
+                    <fieldName>items</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>repeating</fieldRequired>
+                </row>
+            </outputData>
+            <byteCode>
+                <class>
+                    <name>ProcessWebOrderSecureParsePOSTParameters</name>
+                    <byteCode>yv66vgAAADEAdwkAIwA6CQAjADsKACQAPAgAPQcAPgoAIwA/CABACgAFAEEHAEIIAEMIAEQIAEUIAEYKAAkARwcASAoADwA8BwBJCgARADwKABEASgoAEQBLCgAFAEwKAAUATQoACQBOCgAJAE8KAA8AUAoAUQBSCgAPAFMKAA8AVAgAVQgAVgoADwBXCgAPAFgKAA8AWQoAIwBaBwBbBwBcAQAIcG9zdERhdGEBABJMamF2YS9sYW5nL1N0cmluZzsBAAVpdGVtcwEAE1tMamF2YS9sYW5nL1N0cmluZzsBAAtnZXRwb3N0RGF0YQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAC3NldHBvc3REYXRhAQAVKExqYXZhL2xhbmcvU3RyaW5nOylWAQAIZ2V0aXRlbXMBABUoKVtMamF2YS9sYW5nL1N0cmluZzsBAAhzZXRpdGVtcwEAFihbTGphdmEvbGFuZy9TdHJpbmc7KVYBAAY8aW5pdD4BAAMoKVYBAAZpbnZva2UBAApFeGNlcHRpb25zBwBdAQAKU291cmNlRmlsZQEALVByb2Nlc3NXZWJPcmRlclNlY3VyZVBhcnNlUE9TVFBhcmFtZXRlcnMuamF2YQwAJQAmDAAnACgMADMANAEAAAEAGWphdmEvdXRpbC9TdHJpbmdUb2tlbml6ZXIMACkAKgEAASYMADMAXgEAEGphdmEvbGFuZy9TdHJpbmcBAARpdGVtAQAEcHJpYwEABGRlc2MBAARxdWFuDABfAGABABBqYXZhL3V0aWwvVmVjdG9yAQAXamF2YS9sYW5nL1N0cmluZ0J1aWxkZXIMAGEAYgwAYwAqDABkAGUMAGYAKgwAZwBoDABpAGoMAGsAbAcAbQwAbgBvDABwAGUMAHEAcgEAAT0BAAEsDABzAHQMAHUAYAwAdgB0DAAxADIBAF5Qcm9jZXNzRGVmaW5pdGlvbnMvT3JkZXJQcm9jZXNzL1Byb2Nlc3NXZWJPcmRlclNlY3VyZS9Qcm9jZXNzV2ViT3JkZXJTZWN1cmVQYXJzZVBPU1RQYXJhbWV0ZXJzAQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BACcoTGphdmEvbGFuZy9TdHJpbmc7TGphdmEvbGFuZy9TdHJpbmc7KVYBAAZsZW5ndGgBAAMoKUkBAAZhcHBlbmQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvU3RyaW5nQnVpbGRlcjsBAAh0b1N0cmluZwEADWhhc01vcmVUb2tlbnMBAAMoKVoBAAluZXh0VG9rZW4BAAlzdWJzdHJpbmcBABYoSUkpTGphdmEvbGFuZy9TdHJpbmc7AQAHaW5kZXhPZgEAFShMamF2YS9sYW5nL1N0cmluZzspSQEACmFkZEVsZW1lbnQBABUoTGphdmEvbGFuZy9PYmplY3Q7KVYBABVqYXZhL3V0aWwvQ29sbGVjdGlvbnMBAARzb3J0AQATKExqYXZhL3V0aWwvTGlzdDspVgEAB2lzRW1wdHkBAAxmaXJzdEVsZW1lbnQBABQoKUxqYXZhL2xhbmcvT2JqZWN0OwEABnJlbW92ZQEAFShJKUxqYXZhL2xhbmcvT2JqZWN0OwEABHNpemUBAAllbGVtZW50QXQAIQAjACQAAAACAAQAJQAmAAAABAAnACgAAAAGAAEAKQAqAAEAKwAAAB0AAQABAAAABSq0AAGwAAAAAQAsAAAABgABAAAACgABAC0ALgABACsAAAAiAAIAAgAAAAYqK7UAAbEAAAABACwAAAAKAAIAAAANAAUADgABAC8AMAABACsAAAAdAAEAAQAAAAUqtAACsAAAAAEALAAAAAYAAQAAABAAAQAxADIAAQArAAAAIgACAAIAAAAGKiu1AAKxAAAAAQAsAAAACgACAAAAEwAFABQAAQAzADQAAQArAAAANAACAAEAAAAQKrcAAyoSBLUAASoBtQACsQAAAAEALAAAABIABAAAABYABAAHAAoACAAPABcAAQA1ADQAAgArAAACXQAEAA0AAAGxuwAFWSq2AAYSB7cACEwHvQAJWQMSClNZBBILU1kFEgxTWQYSDVNNLAMytgAOPiy+NgQVBL0ADzoFEgQ6BgM2BxUHFQSiAC0ZBRUHuwAPWbcAEFO7ABFZtwASGQa2ABMsFQcytgATtgAUOgaEBwGn/9IrtgAVmQAvK7YAFjoHGQcDHbYAFzoIGQYZCLYAGDYJFQmbAA8ZBRUJHWwyGQe2ABmn/9ADNgcVBxUEogARGQUVBzK4ABqEBwGn/+67AA9ZtwAQOgcZBQMytgAbmgC0GQUVBARkMrYAHMAACToIGQgZCBIdtgAYBGAZCLYADrYAFzoJGQm2AA6eAGsSBDoKAzYLFQsVBARkogBCGQUVCzK2ABzAAAk6DLsAEVm3ABIZCrYAExkMGQwSHbYAGARgGQy2AA62ABe2ABMSHrYAE7YAFDoKhAsBp/+7GQe7ABFZtwASGQq2ABMZCbYAE7YAFLYAGQM2ChUKFQSiABMZBRUKMgO2AB9XhAoBp//sp/9IGQe2ACC9AAk6CAM2CRUJGQi+ogAYGQgVCRkHFQm2ACHAAAlThAkBp//mKhkItgAisQAAAAEALAAAAJoAJgAAACsADgAtACcALgAuAC8AMgAwADkAMgA9ADMARwA0AFMANQBrADMAcQA4AHgAOgB+ADsAhwA8AJAAPQChAD4ApABAAK4AQgC2AEAAvABFAMUARgDPAEgA3gBJAPMASwD7AE0A/wBOAQsAUAEYAFEBRABOAUoAUwFjAFYBfQBXAYAAWQGKAFoBlQBcAaQAWgGqAF4BsABgADYAAAAEAAEANwABADgAAAACADk=</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <postData>
+                    <xsl:value-of select="$Receive-Web-Order/ProcessStarterOutput/PostData"/>
+                </postData>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Create Line Items">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>366</pd:x>
+        <pd:y>0</pd:y>
+        <pd:width>179</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-POST-Parameters/javaCodeActivityOutput/items</pd:over>
+            <pd:iterationElementSlot>currentRecord</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:outSlot>LineItemData</pd:outSlot>
+            <pd:activityOutputName>Compute Line Item</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Compute Line Item</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Compute Line Item</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Compute Line Item">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>445</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Item" type="xsd:string"/>
+                                <xsd:element name="Quantity" type="xsd:int"/>
+                                <xsd:element name="UnitPrice" type="xsd:double"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <Item>
+                        <xsl:value-of select="tib:tokenize-allow-empty($Parse-POST-Parameters/javaCodeActivityOutput/items[$i],&quot;,&quot;)[1]"/>
+                    </Item>
+                    <Quantity>
+                        <xsl:value-of select="tib:tokenize-allow-empty($Parse-POST-Parameters/javaCodeActivityOutput/items[$i],&quot;,&quot;)[4]"/>
+                    </Quantity>
+                    <UnitPrice>
+                        <xsl:value-of select="tib:tokenize-allow-empty($Parse-POST-Parameters/javaCodeActivityOutput/items[$i],&quot;,&quot;)[2]"/>
+                    </UnitPrice>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Invoke ProcessOrder Service">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>623</pd:x>
+        <pd:y>71</pd:y>
+        <config>
+            <timeout>0</timeout>
+            <service>pfx:intfProcessOrder-service</service>
+            <servicePort>intfwsProcessOrderEndpoint0</servicePort>
+            <operation>ProcessOrderOp</operation>
+            <soapAction>/BWP.Core/Services/OrderProcess/Interface/intfProcessOrder-service.serviceagent/intfwsProcessOrderEndpoint0/ProcessOrderOp</soapAction>
+            <sharedChannels>
+                <jmsChannel>
+                    <NamingURL>tibjmsnaming://localhost:7222</NamingURL>
+                    <NamingInitialContextFactory>com.tibco.tibjms.naming.TibjmsInitialContextFactory</NamingInitialContextFactory>
+                    <NamingPrincipal>admin</NamingPrincipal>
+                    <NamingCredential/>
+                    <ConnectionFactory>QueueConnectionFactory</ConnectionFactory>
+                    <JMSTo>USER01.ProcessOrder.Service</JMSTo>
+                    <JMSMessageType>Bytes</JMSMessageType>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSPriority>4</JMSPriority>
+                    <JMSTimeToLive>0</JMSTimeToLive>
+                    <JMSUserName>admin</JMSUserName>
+                    <JMSPassword/>
+                </jmsChannel>
+            </sharedChannels>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <ns2:PurchaseOrder>
+                    <ns2:CustomerID>
+                        <xsl:value-of select="$Receive-Web-Order/ProcessStarterOutput/parameters/account"/>
+                    </ns2:CustomerID>
+                    <ns2:OrderDate>
+                        <xsl:value-of select="substring($Receive-Web-Order/ProcessStarterOutput/parameters/orderdate, 1, 10)"/>
+                    </ns2:OrderDate>
+                    <ns2:ShipmentDate>
+                        <xsl:value-of select="substring($Receive-Web-Order/ProcessStarterOutput/parameters/orderdate, 1, 10)"/>
+                    </ns2:ShipmentDate>
+                    <ns2:ShipmentLocation>
+                        <xsl:value-of select="$Receive-Web-Order/ProcessStarterOutput/parameters/shiplocation"/>
+                    </ns2:ShipmentLocation>
+                    <ns2:DeliveryMethod>
+                        <xsl:value-of select="number($Receive-Web-Order/ProcessStarterOutput/parameters/delivery)"/>
+                    </ns2:DeliveryMethod>
+                    <ns2:Priority>
+                        <xsl:value-of select="$Receive-Web-Order/ProcessStarterOutput/parameters/priority"/>
+                    </ns2:Priority>
+                    <xsl:for-each select="$LineItemData/AccumulatedOutput/root">
+                        <ns2:LineItem>
+                            <ns2:Item>
+                                <xsl:value-of select="Item"/>
+                            </ns2:Item>
+                            <ns2:Quantity>
+                                <xsl:value-of select="Quantity"/>
+                            </ns2:Quantity>
+                            <ns2:UnitPrice>
+                                <xsl:value-of select="UnitPrice"/>
+                            </ns2:UnitPrice>
+                        </ns2:LineItem>
+                    </xsl:for-each>
+                </ns2:PurchaseOrder>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Read Result File">
+        <pd:type>com.tibco.plugin.file.FileReadActivity</pd:type>
+        <pd:resourceType>ae.activities.FileReadActivity</pd:resourceType>
+        <pd:x>726</pd:x>
+        <pd:y>77</pd:y>
+        <config>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ReadActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="$Invoke-ProcessOrder-Service/outputMessage/ns1:OrderProcessingResult/ns1:FileName"/>
+                </fileName>
+            </pfx2:ReadActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="QueryOrders">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>390</pd:x>
+        <pd:y>213</pd:y>
+        <config>
+            <processName>/ProcessDefinitions/OrderProcess/QueryOrders.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Log Query">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>198</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&quot;Received Web Query from account: &quot;, &#xA;$Receive-Web-Order/ProcessStarterOutput/parameters/account)"/>
+                </message>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send Web Response">
+        <pd:type>com.tibco.plugin.http.HTTPResponseActivity</pd:type>
+        <pd:resourceType>httppalette.httpWebResponse</pd:resourceType>
+        <pd:x>570</pd:x>
+        <pd:y>233</pd:y>
+        <config>
+            <closeConnection>true</closeConnection>
+            <eventSource>Receive Web Order</eventSource>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="StatusLine" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Set-Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Location" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings>
+            <ResponseActivityInput>
+                <xsl:choose>
+                    <xsl:when test="$Receive-Web-Order/ProcessStarterOutput/RequestURI = &quot;/purchase&quot;">
+                        <asciiContent>
+                            <xsl:value-of select="concat(&quot;&lt;HTML>&lt;BODY>&lt;PRE>&quot;, &#xA;$Read-Result-File/ns3:ReadActivityOutputTextClass/fileContent/textContent, &quot;&lt;/PRE>&lt;/BODY>&lt;/HTML>&quot;)"/>
+                        </asciiContent>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <asciiContent>
+                            <xsl:value-of select="concat('&lt;HTML>&lt;BODY font face=&quot;Arial, Helvetica, sans-serif&quot;>', &#xA;&quot;&lt;h1>All Orders&lt;/h1>&quot;, '&lt;table border=&quot;1&quot; cellspacing=&quot;0&quot; cellpadding=&quot;2&quot; &#xA;bordercolor=&quot;#ddddff&quot; bgcolor=&quot;#a0b8c8&quot;>', $QueryOrders, &quot;&lt;/table>&lt;/BODY>&lt;/HTML>&quot;)"/>
+                        </asciiContent>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ResponseActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send Mail">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>752</pd:x>
+        <pd:y>285</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>edusvr</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns12:mailActivityInput>
+                <from>
+                    <xsl:value-of select="&quot;admin@edusvr&quot;"/>
+                </from>
+                <xsl:if test="$Receive-Web-Order/ProcessStarterOutput/parameters/email">
+                    <to>
+                        <xsl:value-of select="$Receive-Web-Order/ProcessStarterOutput/parameters/email"/>
+                    </to>
+                </xsl:if>
+                <subject>
+                    <xsl:value-of select="&quot;Order Received&quot;"/>
+                </subject>
+                <ns22:bodyElement>
+                    <fileName>
+                        <xsl:value-of select="$Read-Result-File/ns3:ReadActivityOutputTextClass/fileInfo/fullName"/>
+                    </fileName>
+                </ns22:bodyElement>
+            </ns12:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Receive Web Order</pd:from>
+        <pd:to>Log Order</pd:to>
+        <pd:xpathDescription>Purchase</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Receive-Web-Order/ProcessStarterOutput/RequestURI = "/purchase"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Order</pd:from>
+        <pd:to>Parse POST Parameters</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse POST Parameters</pd:from>
+        <pd:to>Create Line Items</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Create Line Items</pd:from>
+        <pd:to>Invoke ProcessOrder Service</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke ProcessOrder Service</pd:from>
+        <pd:to>Read Result File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Receive Web Order</pd:from>
+        <pd:to>Log Query</pd:to>
+        <pd:xpathDescription>Query</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Receive-Web-Order/ProcessStarterOutput/RequestURI = "/queryorders"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Query</pd:from>
+        <pd:to>QueryOrders</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Read Result File</pd:from>
+        <pd:to>Send Web Response</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>QueryOrders</pd:from>
+        <pd:to>Send Web Response</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Web Response</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Web Response</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains($Receive-Web-Order/ProcessStarterOutput/parameters/email, "@")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Mail</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

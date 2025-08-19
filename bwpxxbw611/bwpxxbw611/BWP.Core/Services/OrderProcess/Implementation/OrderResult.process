@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/PurchaseOrder.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pfx3="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/PurchaseOrder.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/PurchaseOrderSchema.xsd" xmlns:pfx6="http://www.tibco.com/bwp/schemas/purchaseorder" xmlns:pfx7="http://www.tibco.com/bwp/schemas/order">
+    <xsd:import namespace="http://www.tibco.com/bwp/schemas/order" schemaLocation="/BWP.Core/Schema/OrderSchema.xsd"/>
+    <pd:name>BWP.Core/Services/OrderProcess/Implementation/OrderResult.process</pd:name>
+    <pd:description/>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx7:Order"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>80</pd:startY>
+    <pd:returnBindings>
+        <FileName>
+            <xsl:value-of select="$Generate-Result-File-Name/root/resultFile"/>
+        </FileName>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="FileName" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>823</pd:endX>
+    <pd:endY>280</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:group name="Write Items">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:description/>
+        <pd:x>485</pd:x>
+        <pd:y>5</pd:y>
+        <pd:width>156</pd:width>
+        <pd:height>134</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:bw2CompatibilityMode>true</pd:bw2CompatibilityMode>
+            <pd:showBw2CompatibilityMode>true</pd:showBw2CompatibilityMode>
+            <pd:over>$Start/pfx7:Order/pfx7:OrderItems</pd:over>
+            <pd:iterationElementSlot>currentItem</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Write Item Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Write Item Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Write Item Data">
+            <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+            <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+            <pd:description/>
+            <pd:x>565</pd:x>
+            <pd:y>80</pd:y>
+            <config>
+                <append>true</append>
+                <encoding>text</encoding>
+            </config>
+            <pd:inputBindings>
+                <pfx2:WriteActivityInputTextClass>
+                    <fileName>
+                        <xsl:value-of select="$Write-File-Header/pfx2:WriteActivityOutputClass/fileInfo/fullName"/>
+                    </fileName>
+                    <textContent>
+                        <xsl:value-of select="concat(&#xA; $currentItem/pfx7:OrderItems/pfx7:ItemID, &quot;&#x9;&quot;,&#xA; $currentItem/pfx7:OrderItems/pfx7:ItemDesc, &quot;&#x9;&quot;,&#xA; $currentItem/pfx7:OrderItems/pfx7:Quantity, &quot;&#x9;&#x9;&quot;,&#xA; $currentItem/pfx7:OrderItems/pfx7:Status&#xA; )"/>
+                    </textContent>
+                    <addLineSeparator>
+                        <xsl:value-of select="true()"/>
+                    </addLineSeparator>
+                </pfx2:WriteActivityInputTextClass>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Write File Header">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:description/>
+        <pd:x>372</pd:x>
+        <pd:y>80</pd:y>
+        <config>
+            <append>false</append>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <pfx2:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="$Generate-Result-File-Name/root/resultFile"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="concat(&quot;Order ID: &quot;,$Start/pfx7:Order/pfx7:OrderID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Account:  &quot;,$Start/pfx7:Order/pfx7:CustomerID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Total Price: &quot;, $Start/pfx7:Order/pfx7:TotalPrice, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Order Status: &quot;, $Start/pfx7:Order/pfx7:OrderStatus,&#xA;&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Item no.&#x9;Item&#x9;Quantity&#x9;Status&#xD;&#xA;&quot;,&#xA;&quot;----------&#x9;------&#x9;--------&#x9;------&quot;)"/>
+                </textContent>
+                <addLineSeparator>
+                    <xsl:value-of select="true()"/>
+                </addLineSeparator>
+            </pfx2:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Write Credit Rejected">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:description/>
+        <pd:x>436</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <append>false</append>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <pfx2:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="$Generate-Result-File-Name/root/resultFile"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="concat(&quot;Order ID: &quot;,$Start/pfx7:Order/pfx7:OrderID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Account:  &quot;,$Start/pfx7:Order/pfx7:CustomerID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Total Price: &quot;, $Start/pfx7:Order/pfx7:TotalPrice, &quot;&#xD;&#xA;&quot;, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Status: CREDIT CHECK REJECTED&quot;, &quot;&#xD;&#xA;&quot;, &quot;&#xD;&#xA;&quot;)"/>
+                </textContent>
+                <addLineSeparator>
+                    <xsl:value-of select="true()"/>
+                </addLineSeparator>
+            </pfx2:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Write Credit Failed">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:description/>
+        <pd:x>284</pd:x>
+        <pd:y>288</pd:y>
+        <config>
+            <append>false</append>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <pfx2:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="$Generate-Result-File-Name/root/resultFile"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="concat(&quot;Order ID: &quot;,$Start/pfx7:Order/pfx7:OrderID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Account:  &quot;,$Start/pfx7:Order/pfx7:CustomerID, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Total Price: &quot;, $Start/pfx7:Order/pfx7:TotalPrice, &quot;&#xD;&#xA;&quot;, &quot;&#xD;&#xA;&quot;,&#xA;&quot;Status: FAILED TO DO CREDIT CHECK - PLEASE TRY AGAIN LATER&quot;, &quot;&#xD;&#xA;&quot;, &quot;&#xD;&#xA;&quot;)"/>
+                </textContent>
+                <addLineSeparator>
+                    <xsl:value-of select="true()"/>
+                </addLineSeparator>
+            </pfx2:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Result File Name">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:description/>
+        <pd:x>134</pd:x>
+        <pd:y>88</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="resultFile" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <resultFile>
+                    <xsl:value-of select="concat($_globalVariables/pfx3:GlobalVariables/bwp/order.OutputDirectory, &quot;Order_&quot;, $Start/pfx7:Order/pfx7:OrderID, &quot;.txt&quot;)"/>
+                </resultFile>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:description/>
+        <pd:from>Start</pd:from>
+        <pd:to>Generate Result File Name</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Write Items</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Write File Header</pd:from>
+        <pd:to>Write Items</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Write Credit Rejected</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Write Credit Failed</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:description/>
+        <pd:from>Generate Result File Name</pd:from>
+        <pd:to>Write File Header</pd:to>
+        <pd:xpathDescription>Credit Accepted</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx7:Order/pfx7:CreditStatus = "Accepted"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:description/>
+        <pd:from>Generate Result File Name</pd:from>
+        <pd:to>Write Credit Rejected</pd:to>
+        <pd:xpathDescription>Credit Rejected</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx7:Order/pfx7:CreditStatus = "Rejected"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:description/>
+        <pd:from>Generate Result File Name</pd:from>
+        <pd:to>Write Credit Failed</pd:to>
+        <pd:xpathDescription>Credit Failed</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

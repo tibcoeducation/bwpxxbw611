@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/bwp/schemas/creditcheck" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://www.tibco.com/bwp/schemas/creditcheck" schemaLocation="/BWP.Core/Schema/CreditCheckSchema.xsd"/>
+    <pd:name>BWP.Core/Services/CreditCheck/Implementation/PerformCreditCheck.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:CreditCheckRequest"/>
+    <pd:startX>89</pd:startX>
+    <pd:startY>48</pd:startY>
+    <pd:returnBindings>
+        <pfx:CreditCheckResult>
+            <xsl:choose>
+                <xsl:when test="$_error">
+                    <pfx:Status>
+                        <xsl:value-of select="&quot;Failed&quot;"/>
+                    </pfx:Status>
+                </xsl:when>
+                <xsl:otherwise>
+                    <pfx:Status>
+                        <xsl:value-of select="$Check-Credit/Status"/>
+                    </pfx:Status>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx:CreditCheckResult>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:CreditCheckResult"/>
+    <pd:endX>424</pd:endX>
+    <pd:endY>47</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247521748317</pd:targetNamespace>
+    <pd:activity name="Get Account Info">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>201</pd:x>
+        <pd:y>54</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/BWP.Core/Connections/OrderDB.sharedjdbc</jdbcSharedConfig>
+            <wizardData>#Mon Jul 13 15:27:24 PDT 2009&#xD;
+column.1.alias=&#xD;
+column.0.alias=&#xD;
+column.2.alias=&#xD;
+table.0.alias=&#xD;
+column.2.sqldatatype=3&#xD;
+column.1.criteria=&#xD;
+column.1.show=1&#xD;
+column.0.datatypename=VARCHAR2&#xD;
+column.1.or=&#xD;
+column.0.name=ACCOUNT_ID&#xD;
+tablecount=1&#xD;
+column.2.criteria=&#xD;
+columncount=3&#xD;
+column.2.name=AVAILABLE_CREDIT&#xD;
+column.1.sqldatatype=3&#xD;
+table.0.type=0&#xD;
+table.0.y=63&#xD;
+table.0.x=111&#xD;
+table.0.w=143&#xD;
+column.1.sort=0&#xD;
+useSchemaInFQN=false&#xD;
+table.0.h=158&#xD;
+column.2.datatypename=NUMBER&#xD;
+column.1.table=0&#xD;
+column.0.table=0&#xD;
+column.0.sqldatatype=12&#xD;
+table.0.schema=USER01&#xD;
+column.2.or=&#xD;
+column.2.table=0&#xD;
+joincount=0&#xD;
+column.0.show=0&#xD;
+table.0.name=CUSTOMER_ACCOUNT&#xD;
+column.2.show=1&#xD;
+column.1.name=AMOUNT_OWED&#xD;
+column.1.total=0&#xD;
+column.0.total=0&#xD;
+column.2.total=0&#xD;
+column.0.or=&#xD;
+table.0.catalog=&#xD;
+column.0.criteria=\=?&#xD;
+column.0.sort=0&#xD;
+column.1.datatypename=NUMBER&#xD;
+column.2.sort=0&#xD;
+</wizardData>
+            <statement>SELECT CUSTOMER_ACCOUNT.AMOUNT_OWED, CUSTOMER_ACCOUNT.AVAILABLE_CREDIT
+FROM CUSTOMER_ACCOUNT
+WHERE ((CUSTOMER_ACCOUNT.ACCOUNT_ID =?))</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Prepared_Param_1</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>AMOUNT_OWED</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AVAILABLE_CREDIT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <Prepared_Param_1>
+                    <xsl:value-of select="$Start/pfx:CreditCheckRequest/pfx:AccountID"/>
+                </Prepared_Param_1>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Check Credit">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>290</pd:x>
+        <pd:y>119</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Status" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose>
+                <xsl:when test="(count($Get-Account-Info/resultSet/Record) > 0) and &#xA;(($Start/pfx:CreditCheckRequest/pfx:Amount + &#xA;$Get-Account-Info/resultSet/Record[1]/AMOUNT_OWED) &lt;= $Get-Account-Info/resultSet/Record[1]/AVAILABLE_CREDIT)">
+                    <Status>
+                        <xsl:value-of select="&quot;Accepted&quot;"/>
+                    </Status>
+                </xsl:when>
+                <xsl:otherwise>
+                    <Status>
+                        <xsl:value-of select="&quot;Rejected&quot;"/>
+                    </Status>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get Account Info</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Account Info</pd:from>
+        <pd:to>Check Credit</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Check Credit</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Account Info</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
