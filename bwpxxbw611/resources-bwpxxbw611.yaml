@@ -1,0 +1,32 @@
+# Every Database becomes a Resource
+#
+# Debug inputs
+#       application_folder: "bwpxxbw611"
+#              application: "bwpxxbw611"
+#         bw5_project_name: "bwpxxbw611"
+#              bw5_project: {"description":"Starter template for the bwpXX project implementation.","fixedChildren":"AESchemas","projectProperties":{"property":[{"@_key":"ae.process.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.Mail.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.B2B.version","@_value":"5.2.1"},{"@_key":"bam.bf.palette.bfpluginextpalette.version","@_value":"5.3.0.V25"},{"@_key":"ae.palette.BEpalette.version","@_value":"3.0.0"},{"@_key":"ae.palette.Filepalette.version","@_value":"5.6.0"},{"@_key":"ae.palette.SOAPpalette.version","@_value":"5.6.0"},{"@_key":"ae.palette.iProcess.palette.version","@_value":"5.3.0"},{"@_key":"description","@_value":"Starter template for the bwpXX project implementation."},{"@_key":"tibco.be.statemodel.version","@_value":"3.0.0"},{"@_key":"ae.pallette.tcp.pallette.version","@_value":"5.6.0"},{"@_key":"httppalette.httpplugins.version","@_value":"5.6.0"},{"@_key":"ae.palette.FTPpalette.version","@_value":"5.6.0"},{"@_key":"bam.bf.palette.bfapalette.version","@_value":"5.3.0"},{"@_key":"ae.manualwork.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.parsepalette.version","@_value":"5.6.0"},{"@_key":"ae.palette.GeneralPalette.version","@_value":"5.6.0"},{"@_key":"ae.aepalette.ae.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.JDBCpalette.version","@_value":"5.6.0"},{"@_key":"palette.generalpalette.version","@_value":"5.3.0"},{"@_key":"service.palette.version","@_value":"5.6.0"},{"@_key":"palette.ae.metadata.version","@_value":"5.3.0"},{"@_key":"ae.designerapp.version","@_value":"5.6.0.16"},{"@_key":"form.flow.palette.iProcessForms.palette.version","@_value":"5.2.0"},{"@_key":"ae.repo.palette.version","@_value":"5.3.0"},{"@_key":"ae.palette.JMS.palette.version","@_value":"5.6.0"},{"@_key":"score.palette.version","@_value":"5.6.0"},{"@_key":"tibco.be.semantic.version","@_value":"3.0.0"},{"@_key":"ae.palette.java.palette.version","@_value":"5.6.0"},{"@_key":"wsdlresource.palette.version","@_value":"5.6.0"},{"@_key":"aa.adapteradministrator.palette.version","@_value":"5.3.0"},{"@_key":"turbo.palette.version","@_value":"5.6.0"},{"@_key":"adb.palette.version","@_value":"5.5.0.5"},{"@_key":"ae.palette.xml.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.Policy.version","@_value":"5.6.0"},{"@_key":"bam.bf.palette.bfpalette.version","@_value":"5.3.0.V25"},{"@_key":"projectName","@_value":"bwpxxbw611"},{"@_key":"bam.bf.palette.bfpaletteext.version","@_value":"5.3.0.V25"},{"@_key":"ae.palette.transaction.palette.version","@_value":"5.6.0"},{"@_key":"ae.palette.rvpalette.version","@_value":"5.6.0"},{"@_key":"ae.palette.jrmi.palette.version","@_value":"5.6.0"}]},"@_resourceType":"ae.rootfolder","@_name":"bwpxxbw611","@_propLocks":"","@_allowUserToChangeIcon":"false","@_sortContents":"false","@_acceptsResources":"true","@_allowDuplicates":"false"}
+#         bw5_project_name: "bwpxxbw611"
+#  bw5_project_description: "Starter template for the bwpXX project implementation."
+#                  repoUrl: "github.com?owner=tibcoeducation&repo=bwpxxbw611"
+#                    owner: "group:default/tibco-imported"
+#                api_files: ["BWP.Core/Services/OrderProcess/Interface/intfProcessOrder.wsdl","BWP.Core/Services/CreditCheck/Interface/intfPerformCreditCheck.wsdl","BWP.Core/Services/CreditCheck/Contract/UDDI_CreditCheck_ConcreteWSDL.wsdl","BWP.Core/Services/CreditCheck/Contract/ProcessOrderService_ConcreteWSDL.wsdl","BWP.Core/Services/CreditCheck/Contract/CreditCheckService_ConcreteWSDL_WSIL.wsdl","BWP.Core/Services/CreditCheck/Contract/CreditCheckService_ConcreteWSDL_UDDI.wsdl","BWP.Core/Services/CreditCheck/Contract/CreditCheckService_ConcreteWSDL.wsdl"]
+#          api_files_names: ["intfProcessOrder.wsdl","intfPerformCreditCheck.wsdl","UDDI_CreditCheck_ConcreteWSDL.wsdl","ProcessOrderService_ConcreteWSDL.wsdl","CreditCheckService_ConcreteWSDL_WSIL.wsdl","CreditCheckService_ConcreteWSDL_UDDI.wsdl","CreditCheckService_ConcreteWSDL.wsdl"]
+#                 db_files: ["BWP.Core/Connections/OrderDB.sharedjdbc"]
+#           db_files_names: ["OrderDB.sharedjdbc"]
+#            process_files: ["ProcessDefinitions/OrderProcess/QueryOrders.process","ProcessDefinitions/OrderProcess/ProcessWebOrderSecure.process","ProcessDefinitions/OrderProcess/ProcessWebOrder.process","ProcessDefinitions/OrderProcess/ProcessBatchOrder.process","ProcessDefinitions/General/QueryWebServices.process","BWP.Core/Services/OrderProcess/Interface/wsProcessOrder.process","BWP.Core/Services/OrderProcess/Implementation/ProcessOrder.process","BWP.Core/Services/OrderProcess/Implementation/ProcessInventory.process","BWP.Core/Services/OrderProcess/Implementation/OrderResult.process","BWP.Core/Services/CreditCheck/UnitTest/TestCreditCheck.process","BWP.Core/Services/CreditCheck/Interface/wsPerformCreditCheck.process","BWP.Core/Services/CreditCheck/Implementation/PerformCreditCheck.process"]
+#      process_files_names: ["QueryOrders.process","ProcessWebOrderSecure.process","ProcessWebOrder.process","ProcessBatchOrder.process","QueryWebServices.process","wsProcessOrder.process","ProcessOrder.process","ProcessInventory.process","OrderResult.process","TestCreditCheck.process","wsPerformCreditCheck.process","PerformCreditCheck.process"]
+---    
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+#  name: OrderDB_DATABASE
+  name: OrderDB
+  description: OrderDB.sharedjdbc
+  tags:
+    - database
+spec:
+  type: database
+  lifecycle: production
+  owner: group:default/tibco-imported
+  # dependencyOf: component:default/bwpxxbw611
+  # system: bwpxxbw611   
